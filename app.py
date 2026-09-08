@@ -12,17 +12,23 @@ st.set_page_config(
     page_icon="⚡",
     layout="wide"
 )
+# 优先从 Streamlit 云端 Secrets 读取，读不到则从本地 .env 读取，再读不到就用默认配置
+def get_config(key, default=""):
+    if key in st.secrets:
+        return st.secrets[key]
+    return os.getenv(key, default)
 
-# 确保读取最新环境变量
-load_dotenv(override=True)
+LLM_API_KEY = get_config("LLM_API_KEY", "sk-1e1d2b02c61545a7b740e20943a47049)  # 把这里的中文替换成你真实的 sk-xxxx
+LLM_BASE_URL = get_config("LLM_BASE_URL", "https://api.deepseek.com")
+LLM_MODEL = get_config("LLM_MODEL", "deepseek-chat")
+WECOM_WEBHOOK = get_config("WECOM_WEBHOOK_URL", "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=36ece22a-ad31-41d6-992a-5ed9e5d34384")
 
 client = OpenAI(
-    api_key=os.getenv("LLM_API_KEY"),
-    base_url=os.getenv("LLM_BASE_URL")
+    api_key=LLM_API_KEY,
+    base_url=LLM_BASE_URL
 )
 
 EXCEL_FILE = "leads_database.xlsx"
-WECOM_WEBHOOK = os.getenv("WECOM_WEBHOOK_URL", "")
 
 def extract_lead_info(raw_message: str) -> dict:
     prompt = f"""
