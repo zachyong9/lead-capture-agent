@@ -12,16 +12,16 @@ st.set_page_config(
     page_icon="⚡",
     layout="wide"
 )
-# 优先从 Streamlit 云端 Secrets 读取，读不到则从本地 .env 读取，再读不到就用默认配置
-def get_config(key, default=""):
+# 兼容读取：优先读 Streamlit Cloud 的 Secrets，读不到再读本地 .env
+def get_val(key, default=""):
     if key in st.secrets:
         return st.secrets[key]
     return os.getenv(key, default)
 
-LLM_API_KEY = get_config("LLM_API_KEY", "sk-1e1d2b02c61545a7b740e20943a47049)  # 把这里的中文替换成你真实的 sk-xxxx
-LLM_BASE_URL = get_config("LLM_BASE_URL", "https://api.deepseek.com")
-LLM_MODEL = get_config("LLM_MODEL", "deepseek-chat")
-WECOM_WEBHOOK = get_config("WECOM_WEBHOOK_URL", "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=36ece22a-ad31-41d6-992a-5ed9e5d34384")
+LLM_API_KEY = get_val("LLM_API_KEY")
+LLM_BASE_URL = get_val("LLM_BASE_URL", "https://api.deepseek.com")
+LLM_MODEL = get_val("LLM_MODEL", "deepseek-chat")
+WECOM_WEBHOOK = get_val("WECOM_WEBHOOK_URL", "")
 
 client = OpenAI(
     api_key=LLM_API_KEY,
